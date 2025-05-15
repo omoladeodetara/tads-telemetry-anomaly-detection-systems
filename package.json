@@ -1,0 +1,30 @@
+{
+  "name": "tads-telemetry-system",
+  "version": "1.0.0",
+  "description": "A telemetry and anomaly detection system for satellites.",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1234.0",
+    "express": "^4.17.1",
+    "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.3",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.11.7"
+  },
+  "keywords": [
+    "telemetry",
+    "anomaly detection",
+    "satellite",
+    "AWS"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
