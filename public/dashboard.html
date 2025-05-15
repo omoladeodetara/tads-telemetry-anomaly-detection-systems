@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TelemetryIQ - Advanced Analytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/shared.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Side Navigation -->
+        <div class="sidenav">
+            <div class="sidenav-header">
+                <div class="app-logo d-flex align-items-center">
+                    <i class="bi bi-broadcast me-2"></i>
+                    <span>TelemetryIQ</span>
+                    <span class="badge bg-primary ms-2 small">BETA</span>
+                </div>
+            </div>            <div class="sidenav-menu">
+                <a href="/" class="sidenav-item" id="home-tab">
+                    <i class="bi bi-house-door sidenav-icon"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/dashboard.html" class="sidenav-item active" id="analytics-tab">
+                    <i class="bi bi-graph-up sidenav-icon"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="sidenav-item" id="data-entry-tab">
+                    <i class="bi bi-input-cursor-text sidenav-icon"></i>
+                    <span>Data Entry</span>
+                </a>
+                <div class="sidenav-divider"></div>
+                <a href="#" class="sidenav-item">
+                    <i class="bi bi-bell sidenav-icon"></i>
+                    <span>Alerts</span>
+                </a>
+                <a href="#" class="sidenav-item">
+                    <i class="bi bi-gear sidenav-icon"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="sidenav-item" id="about-tab">
+                    <i class="bi bi-info-circle sidenav-icon"></i>
+                    <span>About</span>
+                </a>
+            </div>
+            <div class="sidenav-footer">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div>
+                            <i class="bi bi-person-circle me-2"></i>
+                            <span>Account</span>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="bg-white py-3 px-4 d-flex justify-content-between align-items-center shadow-sm">
+                <button class="sidenav-toggle" id="sidenavToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="d-flex align-items-center">
+                    <button class="dark-mode-toggle me-3" id="dark-mode-toggle" aria-label="Toggle dark mode">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary me-2" title="Help">
+                        <i class="bi bi-question-circle"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" title="Notifications">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                </div>
+            </header>
+        <!-- Dashboard Controls -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <span id="live-indicator"></span>
+                <h2 class="mb-0 fw-bold">Analytics Dashboard</h2>
+            </div>
+            <div class="d-flex align-items-center">
+                <select id="sensor-selector" class="form-select me-3" aria-label="Filter by sensor" title="Select sensor to filter data">
+                    <option value="all">All Sensors</option>
+                    <option value="SENSOR001">SENSOR001</option>
+                    <option value="SENSOR002">SENSOR002</option>
+                    <option value="SENSOR003">SENSOR003</option>
+                </select>
+                <div class="d-flex">
+                    <button id="timeframeBtn" class="btn btn-outline-primary me-3 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-calendar3 me-1"></i>Last 24 hours
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" data-value="1h">Last 1 hour</a></li>
+                        <li><a class="dropdown-item" href="#" data-value="6h">Last 6 hours</a></li>
+                        <li><a class="dropdown-item active" href="#" data-value="24h">Last 24 hours</a></li>
+                        <li><a class="dropdown-item" href="#" data-value="7d">Last 7 days</a></li>
+                    </ul>
+                    <button id="addDataBtn" class="btn btn-primary" aria-label="Add test data" title="Add test data">
+                        <i class="bi bi-plus-circle me-1"></i>Add Test Data
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card borderless-card shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3"><i class="bi bi-clipboard-data text-primary icon-lg"></i></div>
+                        <div class="stat-value" id="total-readings">0</div>
+                        <div class="stat-label">Total Readings</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card borderless-card shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3"><i class="bi bi-exclamation-triangle text-warning icon-lg"></i></div>
+                        <div class="stat-value" id="anomaly-count">0</div>
+                        <div class="stat-label">Anomalies Detected</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card borderless-card shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3"><i class="bi bi-thermometer-half text-danger icon-lg"></i></div>
+                        <div class="stat-value" id="avg-temperature">0°C</div>
+                        <div class="stat-label">Avg Temperature</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card borderless-card shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3"><i class="bi bi-lightning-charge text-primary icon-lg"></i></div>
+                        <div class="stat-value" id="avg-power">0W</div>
+                        <div class="stat-label">Avg Power</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Charts Column -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Temperature Readings (°C)</span>
+                            <span id="temp-time-range" class="text-light">Last 2 minutes</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Power Readings (W)</span>
+                            <span id="power-time-range" class="text-light">Last 2 minutes</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="powerChart"></canvas>
+                        </div>                </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Latest Telemetry Data</div>
+                    <div class="card-body">
+                        <div id="telemetryContainer" class="overflow-auto" style="max-height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Anomalies Column -->
+            <div class="col-lg-4">
+                <div class="card anomaly-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Detected Anomalies</span>
+                            <button id="clearAnomaliesBtn" class="btn btn-sm btn-light">Clear</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="anomaliesContainer" class="overflow-auto" style="max-height: 400px;"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">System Status</div>
+                    <div class="card-body">
+                        <div class="mb-3">                        <div class="d-flex justify-content-between mb-1">
+                                <span>Memory Usage</span>
+                                <span id="memory-usage">45%</span>
+                            </div>
+                            <div class="progress">
+                                <div id="memory-progress" class="progress-bar" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" title="Memory usage: 45%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Processing Rate</span>
+                                <span id="processing-rate">23 items/sec</span>
+                            </div>
+                            <div class="progress">
+                                <div id="processing-progress" class="progress-bar bg-success" role="progressbar" style="width: 67%" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100" title="Processing rate: 23 items/sec"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>System Uptime</span>
+                                <span id="system-uptime">99.9%</span>
+                            </div>
+                            <div class="progress">
+                                <div id="uptime-progress" class="progress-bar bg-info" role="progressbar" style="width: 99.9%" aria-valuenow="99.9" aria-valuemin="0" aria-valuemax="100" title="System uptime: 99.9%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            const tempChartCtx = document.getElementById('temperatureChart').getContext('2d');
+            const powerChartCtx = document.getElementById('powerChart').getContext('2d');
+            
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: CONFIG.CHART_ANIMATION_DURATION
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute',
+                            displayFormats: {
+                                minute: 'HH:mm:ss'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            };
+            
+            const temperatureChart = new Chart(tempChartCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Temperature (°C)',
+                            data: [],
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'High Threshold',
+                            data: [],
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            borderColor: 'rgb(255, 206, 86)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'Low Threshold',
+                            data: [],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const powerChart = new Chart(powerChartCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Power (W)',
+                            data: [],
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgb(153, 102, 255)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'High Threshold',
+                            data: [],
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            borderColor: 'rgb(255, 206, 86)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'Low Threshold',
+                            data: [],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Power (W)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Data Management
+            let readings = [];
+            let anomalies = [];
+            let anomalyCount = 0;
+            let filteredReadings = [];
+            let selectedSensor = 'all';
+            let timeframe = '24h';
+            
+            function processNewData(data) {
+                readings.push(data);
+                
+                // Keep only the last MAX_HISTORY readings to avoid memory issues
+                if (readings.length > CONFIG.MAX_HISTORY) {
+                    readings.shift();
+                }
+                
+                // Apply filter
+                applyFilters();
+                
+                // Update charts
+                updateCharts();
+                
+                // Update table
+                updateTelemetryTable();
+                
+                // Update stats
+                updateStats();
+                
+                // Check for anomalies
+                checkForAnomalies(data);
+            }
+            
+            function checkForAnomalies(data) {
+                const thresholds = CONFIG.ANOMALY_THRESHOLDS;
+                
+                const temp = data.reading.temperature;
+                const power = data.reading.power;
+                
+                let detectedAnomalies = [];
+                
+                if (temp > thresholds.temperature.high) {
+                    detectedAnomalies.push({
+                        alertType: 'High Temperature',
+                        message: `Temperature of ${temp.toFixed(1)}°C exceeds threshold of ${thresholds.temperature.high}°C`,
+                        value: temp,
+                        threshold: thresholds.temperature.high,
+                        type: 'temperature',
+                        sensorId: data.sensorId,
+                        timestamp: data.timestamp
+                    });
+                }
+                
+                if (temp < thresholds.temperature.low) {
+                    detectedAnomalies.push({
+                        alertType: 'Low Temperature',
+                        message: `Temperature of ${temp.toFixed(1)}°C below threshold of ${thresholds.temperature.low}°C`,
+                        value: temp,
+                        threshold: thresholds.temperature.low,
+                        type: 'temperature',
+                        sensorId: data.sensorId,
+                        timestamp: data.timestamp
+                    });
+                }
+                
+                if (power > thresholds.power.high) {
+                    detectedAnomalies.push({
+                        alertType: 'High Power',
+                        message: `Power of ${power.toFixed(0)}W exceeds threshold of ${thresholds.power.high}W`,
+                        value: power,
+                        threshold: thresholds.power.high,
+                        type: 'power',
+                        sensorId: data.sensorId,
+                        timestamp: data.timestamp
+                    });
+                }
+                
+                if (power < thresholds.power.low) {
+                    detectedAnomalies.push({
+                        alertType: 'Low Power',
+                        message: `Power of ${power.toFixed(0)}W below threshold of ${thresholds.power.low}W`,
+                        value: power,
+                        threshold: thresholds.power.low,
+                        type: 'power',
+                        sensorId: data.sensorId,
+                        timestamp: data.timestamp
+                    });
+                }
+                
+                if (detectedAnomalies.length > 0) {
+                    anomalies = [...anomalies, ...detectedAnomalies];
+                    anomalyCount += detectedAnomalies.length;
+                    updateAnomaliesDisplay();
+                }
+            }
+            
+            function updateAnomaliesDisplay() {
+                const container = document.getElementById('anomaliesContainer');
+                
+                if (anomalies.length === 0) {
+                    container.innerHTML = '<p class="text-center text-muted">No anomalies detected</p>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                // Sort anomalies by timestamp, newest first
+                anomalies.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                anomalies.forEach(anomaly => {
+                    const time = formatTimeLabel(new Date(anomaly.timestamp));
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-warning mb-2';
+                    alertDiv.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>${anomaly.alertType}</strong>
+                            <span class="badge bg-secondary">${anomaly.sensorId}</span>
+                        </div>
+                        <div class="small mb-1">${time}</div>
+                        <div>${anomaly.message}</div>
+                    `;
+                    container.appendChild(alertDiv);
+                });
+                
+                // Update anomaly count in the stats
+                document.getElementById('anomaly-count').textContent = anomalyCount.toString();
+            }
+            
+            function updateStats() {
+                // Total readings
+                document.getElementById('total-readings').textContent = readings.length.toString();
+                
+                if (filteredReadings.length === 0) {
+                    document.getElementById('avg-temperature').textContent = '0°C';
+                    document.getElementById('avg-power').textContent = '0W';
+                    return;
+                }
+                
+                // Calculate average temperature
+                const totalTemp = filteredReadings.reduce((sum, item) => sum + item.reading.temperature, 0);
+                const avgTemp = totalTemp / filteredReadings.length;
+                document.getElementById('avg-temperature').textContent = `${avgTemp.toFixed(1)}°C`;
+                
+                // Calculate average power
+                const totalPower = filteredReadings.reduce((sum, item) => sum + item.reading.power, 0);
+                const avgPower = totalPower / filteredReadings.length;
+                document.getElementById('avg-power').textContent = `${avgPower.toFixed(0)}W`;
+            }
+            
+            function updateTelemetryTable() {
+                const container = document.getElementById('telemetryContainer');
+                
+                if (filteredReadings.length === 0) {
+                    container.innerHTML = '<p class="text-center text-muted">No data available</p>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Sensor</th>
+                                <th>Temp</th>
+                                <th>Power</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telemetryTableBody">
+                        </tbody>
+                    </table>
+                `;
+                
+                const tableBody = document.getElementById('telemetryTableBody');
+                
+                // Sort readings by timestamp, newest first
+                const sortedReadings = [...filteredReadings].sort((a, b) => 
+                    new Date(b.timestamp) - new Date(a.timestamp)
+                );
+                
+                // Show latest 15 readings
+                sortedReadings.slice(0, 15).forEach(reading => {
+                    const row = document.createElement('tr');
+                    
+                    const time = formatTimeLabel(new Date(reading.timestamp));
+                    const statusClass = getStatusClass(reading.reading.status);
+                    
+                    row.innerHTML = `
+                        <td>${time}</td>
+                        <td>${reading.sensorId}</td>
+                        <td>${reading.reading.temperature.toFixed(1)}°C</td>
+                        <td>${reading.reading.power.toFixed(0)}W</td>
+                        <td><span class="${statusClass}">${reading.reading.status}</span></td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            function applyFilters() {
+                // Filter by sensor
+                filteredReadings = selectedSensor === 'all' 
+                    ? [...readings] 
+                    : readings.filter(reading => reading.sensorId === selectedSensor);
+                
+                // Filter by timeframe
+                const now = new Date();
+                let cutoffTime;
+                
+                switch(timeframe) {
+                    case '1h':
+                        cutoffTime = new Date(now.getTime() - 60 * 60 * 1000);
+                        break;
+                    case '6h':
+                        cutoffTime = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+                        break;
+                    case '24h':
+                        cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                        break;
+                    case '7d':
+                        cutoffTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        break;
+                    default:
+                        cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                }
+                
+                filteredReadings = filteredReadings.filter(reading => 
+                    new Date(reading.timestamp) > cutoffTime
+                );
+            }
+            
+            function updateCharts() {
+                if (filteredReadings.length === 0) {
+                    clearCharts();
+                    return;
+                }
+                
+                // Prepare data for charts
+                const sortedReadings = [...filteredReadings].sort((a, b) => 
+                    new Date(a.timestamp) - new Date(b.timestamp)
+                );
+                
+                const timeData = sortedReadings.map(reading => new Date(reading.timestamp));
+                const tempData = sortedReadings.map(reading => reading.reading.temperature);
+                const powerData = sortedReadings.map(reading => reading.reading.power);
+                
+                // Create threshold data
+                const highTempThreshold = Array(timeData.length).fill(CONFIG.ANOMALY_THRESHOLDS.temperature.high);
+                const lowTempThreshold = Array(timeData.length).fill(CONFIG.ANOMALY_THRESHOLDS.temperature.low);
+                const highPowerThreshold = Array(timeData.length).fill(CONFIG.ANOMALY_THRESHOLDS.power.high);
+                const lowPowerThreshold = Array(timeData.length).fill(CONFIG.ANOMALY_THRESHOLDS.power.low);
+                
+                // Update temperature chart
+                temperatureChart.data.labels = timeData;
+                temperatureChart.data.datasets[0].data = tempData.map((y, i) => ({x: timeData[i], y}));
+                temperatureChart.data.datasets[1].data = highTempThreshold.map((y, i) => ({x: timeData[i], y}));
+                temperatureChart.data.datasets[2].data = lowTempThreshold.map((y, i) => ({x: timeData[i], y}));
+                temperatureChart.update();
+                
+                // Update power chart
+                powerChart.data.labels = timeData;
+                powerChart.data.datasets[0].data = powerData.map((y, i) => ({x: timeData[i], y}));
+                powerChart.data.datasets[1].data = highPowerThreshold.map((y, i) => ({x: timeData[i], y}));
+                powerChart.data.datasets[2].data = lowPowerThreshold.map((y, i) => ({x: timeData[i], y}));
+                powerChart.update();
+                
+                // Update time range display
+                const firstTime = timeData.length > 0 ? formatTimeLabel(timeData[0]) : 'N/A';
+                const lastTime = timeData.length > 0 ? formatTimeLabel(timeData[timeData.length - 1]) : 'N/A';
+                
+                document.getElementById('temp-time-range').textContent = `${firstTime} - ${lastTime}`;
+                document.getElementById('power-time-range').textContent = `${firstTime} - ${lastTime}`;
+            }
+            
+            function clearCharts() {
+                temperatureChart.data.labels = [];
+                temperatureChart.data.datasets[0].data = [];
+                temperatureChart.data.datasets[1].data = [];
+                temperatureChart.data.datasets[2].data = [];
+                temperatureChart.update();
+                
+                powerChart.data.labels = [];
+                powerChart.data.datasets[0].data = [];
+                powerChart.data.datasets[1].data = [];
+                powerChart.data.datasets[2].data = [];
+                powerChart.update();
+                
+                document.getElementById('temp-time-range').textContent = 'No data';
+                document.getElementById('power-time-range').textContent = 'No data';
+            }
+            
+            // Bind UI events
+            document.getElementById('sensor-selector').addEventListener('change', function(e) {
+                selectedSensor = e.target.value;
+                applyFilters();
+                updateCharts();
+                updateTelemetryTable();
+                updateStats();
+            });
+            
+            document.querySelectorAll('#timeframeBtn + .dropdown-menu .dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active state in dropdown
+                    document.querySelectorAll('#timeframeBtn + .dropdown-menu .dropdown-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    
+                    // Update button text
+                    const btnText = e.target.textContent;
+                    document.getElementById('timeframeBtn').innerHTML = `<i class="bi bi-calendar3 me-1"></i>${btnText}`;
+                    
+                    // Update timeframe
+                    timeframe = e.target.getAttribute('data-value');
+                    applyFilters();
+                    updateCharts();
+                    updateTelemetryTable();
+                    updateStats();
+                });
+            });
+            
+            document.getElementById('clearAnomaliesBtn').addEventListener('click', function() {
+                anomalies = [];
+                anomalyCount = 0;
+                updateAnomaliesDisplay();
+            });
+
+            document.getElementById('addDataBtn').addEventListener('click', function() {
+                // Use the shared generateTestData function
+                const testData = generateTestData(Math.random() < 0.3);
+                
+                // Send data to server
+                sendTelemetryData(testData)
+                    .then(data => {
+                        console.log('Data sent successfully:', data);
+                        processNewData(testData); // Update UI immediately
+                    })
+                    .catch(error => {
+                        console.error('Error sending data:', error);
+                        // Process the data anyway for demo purposes
+                        processNewData(testData);
+                    });
+            });
+
+            // Start with some test data
+            setTimeout(() => {
+                document.getElementById('addDataBtn').click();
+            }, 500);
+
+            // Poll for new data
+            function pollForData() {
+                fetchAnomalies()
+                    .then(data => {
+                        if (data.length > anomalies.length) {
+                            // New anomalies detected from server
+                            anomalies = data;
+                            anomalyCount = data.length;
+                            updateAnomaliesDisplay();
+                            updateStats();
+                        }
+                    })
+                    .catch(error => console.error('Error fetching anomalies:', error));
+            }
+
+            // Poll every 2 seconds
+            setInterval(pollForData, 2000);
+            
+            // Start simulation
+            let simulationInterval = 5000; // 5 seconds
+            function startSimulation() {
+                setInterval(() => {
+                    document.getElementById('addDataBtn').click();
+                }, simulationInterval);
+            }
+            
+            // Start automatic data generation after 2 seconds
+            setTimeout(startSimulation, 2000);
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,25 +1,48 @@
 // src/services/buffer.ts
+import { Telemetry } from '../models/telemetry';
 
 export class BufferService {
-    private consistentBuffer: any[] = [];
-    private intermittentBuffer: any[] = [];
+    private consistentBuffer: Telemetry[] = [];
+    private intermittentBuffer: Telemetry[] = [];
+    private maxBufferSize: number = 1000; // Limit buffer size to prevent memory issues
 
-    constructor() {}
+    constructor(maxBufferSize: number = 1000) {
+        this.maxBufferSize = maxBufferSize;
+    }
 
-    public addToConsistentBuffer(data: any): void {
+    public addToConsistentBuffer(data: Telemetry): void {
         this.consistentBuffer.push(data);
+        // Maintain buffer size
+        if (this.consistentBuffer.length > this.maxBufferSize) {
+            this.consistentBuffer.shift(); // Remove oldest data
+        }
     }
 
-    public addToIntermittentBuffer(data: any): void {
+    public addToIntermittentBuffer(data: Telemetry): void {
         this.intermittentBuffer.push(data);
+        // Maintain buffer size
+        if (this.intermittentBuffer.length > this.maxBufferSize) {
+            this.intermittentBuffer.shift(); // Remove oldest data
+        }
     }
 
-    public getConsistentBuffer(): any[] {
+    public getConsistentBuffer(): Telemetry[] {
         return this.consistentBuffer;
     }
 
-    public getIntermittentBuffer(): any[] {
+    public getIntermittentBuffer(): Telemetry[] {
         return this.intermittentBuffer;
+    }
+
+    public getLatestData(count: number = 10): Telemetry[] {
+        return this.consistentBuffer.slice(-count);
+    }
+
+    public getDataByTimeRange(startTime: Date, endTime: Date): Telemetry[] {
+        return this.consistentBuffer.filter(data => {
+            const timestamp = new Date(data.timestamp);
+            return timestamp >= startTime && timestamp <= endTime;
+        });
     }
 
     public clearConsistentBuffer(): void {
