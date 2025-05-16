@@ -1,0 +1,371 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Layout } from "@/components/layout/layout";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowRight, BarChart2, Bell, Shield, Zap, Database, ShieldAlert } from "lucide-react";
+import { checkHealth, fetchAnomalies, fetchTelemetryData } from '@/services/api';
+import { AlertData, TelemetryData } from '@/types';
+import { Loading } from '@/components/ui/spinner';
+import { formatRelativeTime } from '@/lib/format';
+
+export default function Home() {
+  const [systemStatus, setSystemStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+  const [alerts, setAlerts] = useState<AlertData[]>([]);
+  const [telemetryStats, setTelemetryStats] = useState({
+    totalSensors: 0,
+    dataPoints: 0,
+    lastUpdated: '',
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        // Check API health
+        let health;
+        try {
+          health = await checkHealth();
+          setSystemStatus(health.status === 'ok' ? 'online' : 'offline');
+        } catch (error) {
+          console.error('Health check failed:', error);
+          setSystemStatus('offline');
+        }
+        
+        // Get alerts and telemetry in parallel
+        try {
+          const [alertsData, telemetryData] = await Promise.all([
+            fetchAnomalies(),
+            fetchTelemetryData()
+          ]);
+          
+          setAlerts(alertsData);
+          
+          // Calculate telemetry statistics
+          if (telemetryData && telemetryData.length > 0) {
+            const uniqueSensors = new Set(telemetryData.map((item: TelemetryData) => item.sensorId));
+            const latestTimestamp = telemetryData
+              .map((item: TelemetryData) => new Date(item.timestamp).getTime())
+              .reduce((max: number, time: number) => Math.max(max, time), 0);
+            
+            setTelemetryStats({
+              totalSensors: uniqueSensors.size,
+              dataPoints: telemetryData.length,
+              lastUpdated: new Date(latestTimestamp).toLocaleString(),
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        setSystemStatus('offline');
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadData();
+  }, []);
+  
+  return (
+    <Layout>
+      <div className="space-y-8">
+        {/* Hero Section */}
+        <section className="py-6">
+          {loading ? (
+            <Loading text="Loading telemetry data..." />
+          ) : (
+            <div className="container px-4 md:px-6 mx-auto">
+              <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+                <div className="space-y-4">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                    Intelligent Satellite Monitoring & Analytics
+                  </h1>
+                  <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                    AI-powered anomaly detection with real-time visualization for
+                    next-generation satellite systems.
+                  </p>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button asChild size="lg">
+                      <Link href="/dashboard">
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        View Dashboard
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="lg">
+                      Learn More
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <div className="relative w-full max-w-[400px] aspect-square">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl" />
+                    <div className="relative border border-border bg-background rounded-xl shadow-xl p-6 flex items-center justify-center">
+                      <div className="w-full h-full rounded-md overflow-hidden">
+                        <div className="w-full h-full bg-black/5 dark:bg-white/5 flex items-center justify-center">
+                          <span className="text-4xl">🛰️</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Features Section */}
+        <section className="py-12 bg-muted/30 rounded-xl">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold tracking-tighter">
+                Key Features
+              </h2>
+              <p className="text-muted-foreground md:text-lg mt-2">
+                Powerful tools for satellite telemetry monitoring and analysis
+              </p>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <Card>
+                <CardHeader>
+                  <div className="p-2 rounded-md w-10 h-10 bg-primary/10 flex items-center justify-center mb-2">
+                    <BarChart2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <CardTitle>Real-time Monitoring</CardTitle>
+                  <CardDescription>
+                    Monitor satellite telemetry data in real-time with interactive
+                    dashboards
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  View critical metrics with millisecond precision and responsive
+                  visualizations.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <div className="p-2 rounded-md w-10 h-10 bg-primary/10 flex items-center justify-center mb-2">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <CardTitle>Anomaly Detection</CardTitle>
+                  <CardDescription>
+                    AI-powered detection of potential issues before they become
+                    critical
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  Advanced machine learning algorithms identify patterns and
+                  detect deviations automatically.
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <div className="p-2 rounded-md w-10 h-10 bg-primary/10 flex items-center justify-center mb-2">
+                    <Bell className="h-5 w-5 text-primary" />
+                  </div>
+                  <CardTitle>Smart Alerts</CardTitle>
+                  <CardDescription>
+                    Receive notifications for critical events through multiple
+                    channels
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  Configure customized alert thresholds and notification
+                  preferences for your team.
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* System Status Section */}
+        <section className="py-8">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold tracking-tighter">
+                System Status
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                Real-time monitoring of the telemetry system
+              </p>
+            </div>
+            
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium">API Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center">
+                    <div className={`h-3 w-3 rounded-full mr-2 ${
+                      systemStatus === 'online' 
+                        ? 'bg-green-500' 
+                        : systemStatus === 'offline' 
+                          ? 'bg-red-500' 
+                          : 'bg-amber-500'
+                    }`}></div>
+                    <span className="font-medium">{
+                      systemStatus === 'online' 
+                        ? 'Connected' 
+                        : systemStatus === 'offline' 
+                          ? 'Disconnected' 
+                          : 'Checking...'
+                    }</span>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium">Active Sensors</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{telemetryStats.totalSensors}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Connected and reporting data
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium">Data Points</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{telemetryStats.dataPoints}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Total readings collected
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{alerts.length}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {alerts.filter(a => a.severity === 'critical').length} critical,{' '}
+                    {alerts.filter(a => a.severity !== 'critical').length} warning
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Recent Alerts Section */}
+        {alerts.length > 0 && (
+          <section className="py-8">
+            <div className="container px-4 md:px-6 mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tighter">
+                    Recent Alerts
+                  </h2>
+                  <p className="text-muted-foreground mt-2">
+                    Latest detected system anomalies
+                  </p>
+                </div>
+                <Button asChild variant="outline">
+                  <Link href="/alerts">
+                    View All
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                {alerts.slice(0, 3).map((alert, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center space-x-4">
+                        <div className={`h-2 w-2 rounded-full ${
+                          alert.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'
+                        }`}></div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {alert.message}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatRelativeTime(alert.timestamp)}
+                          </p>
+                        </div>
+                        <div className="ml-auto">
+                          <span className={`rounded-md px-2 py-1 text-xs font-medium ${
+                            alert.severity === 'critical' 
+                              ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' 
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300'
+                          }`}>
+                            {alert.severity === 'critical' ? 'Critical' : 'Warning'}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Quick Actions Section */}
+        <section className="py-8">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold tracking-tighter">
+                Quick Actions
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                Commonly used features and tools
+              </p>
+            </div>
+            
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <Button asChild variant="outline" className="h-20">
+                <Link href="/dashboard" className="flex flex-col items-center justify-center gap-2">
+                  <BarChart2 className="h-5 w-5" />
+                  <span>Dashboard</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-20">
+                <Link href="/data-entry" className="flex flex-col items-center justify-center gap-2">
+                  <Database className="h-5 w-5" />
+                  <span>Enter Data</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-20">
+                <Link href="/alerts" className="flex flex-col items-center justify-center gap-2">
+                  <ShieldAlert className="h-5 w-5" />
+                  <span>View Alerts</span>
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="h-20">
+                <Link href="/settings" className="flex flex-col items-center justify-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  <span>Settings</span>
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </Layout>
+  );
+}
