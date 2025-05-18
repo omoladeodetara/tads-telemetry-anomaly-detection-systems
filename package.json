@@ -1,14 +1,15 @@
 {
-  "name": "tads-telemetry-system",
+  "name": "tads-telemetry-api",
   "version": "1.0.0",
-  "description": "A telemetry and anomaly detection system for satellites.",
+  "description": "API server for the telemetry and anomaly detection system.",
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
     "test": "jest",
-    "simulate": "ts-node src/simulate.ts"
+    "simulate": "ts-node src/simulate.ts",
+    "dev:all": "powershell -File dev.ps1"
   },
   "dependencies": {
     "aws-sdk": "^2.1234.0",
@@ -19,6 +20,7 @@
     "@types/express": "^5.0.1",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.11.7",
+    "concurrently": "^6.2.1",
     "jest": "^27.0.6",
     "nodemon": "^3.1.10",
     "ts-jest": "^27.0.3",

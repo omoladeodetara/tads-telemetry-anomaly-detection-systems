@@ -1,9 +1,7 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { Layout } from "@/component        {/* Hero Section */}
-        <section className="py-6">
-          {loading ? (
-            <Loading text="Loading telemetry data..." />
-          ) : (layout/layout";
+import { Layout } from "@/components/layout/layout";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,7 +15,6 @@ import Link from "next/link";
 import { ArrowRight, BarChart2, Bell, Shield, Zap, Database, ShieldAlert } from "lucide-react";
 import { checkHealth, fetchAnomalies, fetchTelemetryData } from '@/services/api';
 import { AlertData, TelemetryData } from '@/types';
-import { formatRelativeTime } from '@/lib/format';
 import { Loading } from '@/components/ui/spinner';
 import { formatRelativeTime } from '@/lib/format';
 

@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import path from 'path';
 import { Telemetry } from './models/telemetry';
 import { processData, processIncomingData } from './handlers/processData';
 import { detectAnomalies } from './handlers/anomalyDetection';
@@ -16,15 +15,7 @@ let detectedAnomalies: Alert[] = [];
 const app = express();
 app.use(express.json());
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, '../public')));
-
-const PORT = process.env.PORT || 3000;
-
-// Route for dashboard
-app.get('/dashboard', (_req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, '../public/dashboard.html'));
-});
+const PORT = process.env.PORT || 4000;
 
 // API Routes
 app.post('/api/telemetry', (req: Request, res: Response) => {
@@ -77,6 +68,5 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-    console.log(`Dashboard available at http://localhost:${PORT}/dashboard`);
+    console.log(`API server running at http://localhost:${PORT}`);
 });

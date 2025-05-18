@@ -23,78 +23,104 @@ export function Sidebar() {
       </div>
       <ScrollArea className="flex-1">
         <nav className="flex flex-col gap-2 p-2">
-          <Link href="/" legacyBehavior>
+          <Link href="/">
             <Button 
               variant={pathname === "/" ? "secondary" : "ghost"} 
               className="w-full justify-start"
+              asChild
             >
-              <Home className="mr-2 h-4 w-4" />
-              Home
+              <div>
+                <Home className="mr-2 h-4 w-4" />
+                Home
+              </div>
             </Button>
           </Link>
-          <Link href="/dashboard" legacyBehavior>
+          <Link href="/dashboard">
             <Button 
               variant={pathname === "/dashboard" ? "secondary" : "ghost"} 
               className="w-full justify-start"
+              asChild
             >
-              <BarChart2 className="mr-2 h-4 w-4" />
-              Analytics
+              <div>
+                <BarChart2 className="mr-2 h-4 w-4" />
+                Analytics
+              </div>
             </Button>
           </Link>
-          <Link href="/data-entry" legacyBehavior>
+          <Link href="/data-entry">
             <Button 
               variant={pathname === "/data-entry" ? "secondary" : "ghost"} 
               className="w-full justify-start"
+              asChild
             >
-              <Database className="mr-2 h-4 w-4" />
-              Data Entry
+              <div>
+                <Database className="mr-2 h-4 w-4" />
+                Data Entry
+              </div>
             </Button>
           </Link>
-          <div className="h-px my-2 bg-border"></div>
-          <Link href="/alerts" legacyBehavior>
+          <Link href="/telemetry">
+            <Button 
+              variant={pathname === "/telemetry" ? "secondary" : "ghost"} 
+              className="w-full justify-start"
+              asChild
+            >
+              <div>
+                <Database className="mr-2 h-4 w-4" />
+                Telemetry
+              </div>
+            </Button>
+          </Link>
+          <Link href="/alerts">
             <Button 
               variant={pathname === "/alerts" ? "secondary" : "ghost"} 
               className="w-full justify-start"
+              asChild
             >
-              <Bell className="mr-2 h-4 w-4" />
-              Alerts
+              <div>
+                <Bell className="mr-2 h-4 w-4" />
+                Alerts
+              </div>
             </Button>
           </Link>
-          <Link href="/settings" legacyBehavior>
+          <Link href="/systems">
+            <Button 
+              variant={pathname === "/systems" ? "secondary" : "ghost"} 
+              className="w-full justify-start"
+              asChild
+            >
+              <div>
+                <Database className="mr-2 h-4 w-4" />
+                Systems
+              </div>
+            </Button>
+          </Link>
+          <Link href="/settings">
             <Button 
               variant={pathname === "/settings" ? "secondary" : "ghost"} 
               className="w-full justify-start"
+              asChild
             >
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+              <div>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </div>
             </Button>
           </Link>
-          <Link href="/about" legacyBehavior>
+          <Link href="/about">
             <Button 
               variant={pathname === "/about" ? "secondary" : "ghost"} 
               className="w-full justify-start"
+              asChild
             >
-              <Info className="mr-2 h-4 w-4" />
-              About
+              <div>
+                <Info className="mr-2 h-4 w-4" />
+                About
+              </div>
             </Button>
           </Link>
         </nav>
       </ScrollArea>
-      <div className="p-4 border-t">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <span className="text-xs font-medium">U</span>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Account</p>
-            </div>
-          </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
