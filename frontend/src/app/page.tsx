@@ -16,7 +16,6 @@ import { ArrowRight, BarChart2, Bell, Shield, Zap, Database, ShieldAlert } from 
 import { checkHealth, fetchAnomalies, fetchTelemetryData } from '@/services/api';
 import { AlertData, TelemetryData } from '@/types';
 import { Loading } from '@/components/ui/spinner';
-import { formatRelativeTime } from '@/lib/format';
 
 export default function Home() {
   const [systemStatus, setSystemStatus] = useState<'online' | 'offline' | 'checking'>('checking');
