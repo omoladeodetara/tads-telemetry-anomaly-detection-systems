@@ -10,13 +10,15 @@ export function detectAnomalies(data: Telemetry[]): Alert[] {
         if (telemetry.reading.temperature > ALERT_THRESHOLDS.temperature.high) {
             alerts.push(new Alert(
                 'TemperatureAlert', 
-                `High temperature detected for sensor ${telemetry.sensorId} (${telemetry.reading.temperature.toFixed(1)}°C)`
+                `High temperature detected for sensor ${telemetry.sensorId} (${telemetry.reading.temperature.toFixed(1)}°C)`,
+                telemetry.sensorId
             ));
         }
         if (telemetry.reading.temperature < ALERT_THRESHOLDS.temperature.low) {
             alerts.push(new Alert(
                 'TemperatureAlert', 
-                `Low temperature detected for sensor ${telemetry.sensorId} (${telemetry.reading.temperature.toFixed(1)}°C)`
+                `Low temperature detected for sensor ${telemetry.sensorId} (${telemetry.reading.temperature.toFixed(1)}°C)`,
+                telemetry.sensorId
             ));
         }
         
@@ -24,13 +26,15 @@ export function detectAnomalies(data: Telemetry[]): Alert[] {
         if (telemetry.reading.power > ALERT_THRESHOLDS.power.high) {
             alerts.push(new Alert(
                 'PowerAlert', 
-                `High power usage detected for sensor ${telemetry.sensorId} (${telemetry.reading.power.toFixed(1)}W)`
+                `High power usage detected for sensor ${telemetry.sensorId} (${telemetry.reading.power.toFixed(1)}W)`,
+                telemetry.sensorId
             ));
         }
         if (telemetry.reading.power < ALERT_THRESHOLDS.power.low) {
             alerts.push(new Alert(
                 'PowerAlert', 
-                `Low power usage detected for sensor ${telemetry.sensorId} (${telemetry.reading.power.toFixed(1)}W)`
+                `Low power usage detected for sensor ${telemetry.sensorId} (${telemetry.reading.power.toFixed(1)}W)`,
+                telemetry.sensorId
             ));
         }
         
@@ -38,7 +42,8 @@ export function detectAnomalies(data: Telemetry[]): Alert[] {
         if (telemetry.reading.status.toUpperCase() !== 'OPERATIONAL') {
             alerts.push(new Alert(
                 'StatusAlert', 
-                `Abnormal status for sensor ${telemetry.sensorId}: ${telemetry.reading.status}`
+                `Abnormal status for sensor ${telemetry.sensorId}: ${telemetry.reading.status}`,
+                telemetry.sensorId
             ));
         }
     });
